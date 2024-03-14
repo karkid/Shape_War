@@ -29,6 +29,7 @@ public:
     EntityPtr addEntity(const std::string& tag);
     void removeEntity(EntityPtr& entity);
     Entities& getEntities();
+    bool tagCount(const std::string& tag) const;
     Entities& getEntities(const std::string& tag);
 };
 inline std::atomic<int> EntityManager::nextId(1);

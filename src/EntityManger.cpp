@@ -45,6 +45,11 @@ Entities &EntityManager::getEntities()
     return m_entities;
 }
 
+bool EntityManager::tagCount(const std::string &tag) const
+{
+    return m_entityMap.count(tag);
+}
+
 Entities &EntityManager::getEntities(const std::string &tag)
 {
     return m_entityMap.at(tag);

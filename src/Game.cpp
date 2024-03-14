@@ -29,14 +29,15 @@ void Game::sMovement()
         m_player->cTransform->pos.x += m_player->cTransform->velocity.x;
     }
 
-    for (auto& bullet : m_entities.getEntities())
+    if (m_entities.tagCount("bullet"))
     {
-        if (bullet->tag() == "bullet")
+        for (auto& bullet : m_entities.getEntities("bullet"))
         {
             bullet->cTransform->pos.x += bullet->cTransform->velocity.x;
-            bullet->cTransform->pos.y += bullet->cTransform->velocity.x;
+            bullet->cTransform->pos.y += bullet->cTransform->velocity.y;
         }
     }
+
 }
 
 void Game::sUserInput()
@@ -257,9 +258,9 @@ void Game::spawnBullet(EntityPtr source_entity, Vector2 target)
     auto entity = m_entities.addEntity("bullet");
 
     Vector2 pos(source_entity->cShape->circle.getPosition().x, source_entity->cShape->circle.getPosition().y);
-    Vector2 speed = target - pos;
-    speed.normalize();
-    speed *= Vector2(m_bulletConfig.S, m_bulletConfig.S);
+    Vector2 dir = target - pos;
+    dir.normalize();
+    Vector2 speed = dir * Vector2(m_bulletConfig.S, m_bulletConfig.S);
     entity->cTransform = std::make_shared<CTransform>( pos, speed, Vector2(1.0f,1.0f), 0.0f );
     entity->cShape = std::make_shared<CShape>( m_bulletConfig.SR, m_bulletConfig.V, sf::Color(m_bulletConfig.FR, m_bulletConfig.FG, m_bulletConfig.FB)
                                                ,sf::Color(m_bulletConfig.OR, m_bulletConfig.OG, m_bulletConfig.OB)
