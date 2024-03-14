@@ -35,6 +35,7 @@ public:
     double cross_product(const Vector2& rhs) const;
     void normalize();
     double length() const;
+    double distance(const Vector2& to) const;
 };
 
 inline std::ostream& operator<<(std::ostream& os, const Vector2& v)

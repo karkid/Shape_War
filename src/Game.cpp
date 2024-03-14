@@ -38,6 +38,22 @@ void Game::sMovement()
         }
     }
 
+    if (m_entities.tagCount("enemy"))
+    {
+        for (auto& enemy : m_entities.getEntities("enemy"))
+        {
+            if (enemy->cShape->circle.getRadius() > enemy->cShape->circle.getPosition().x || enemy->cShape->circle.getPosition().x  > (m_window.getSize().x - enemy->cShape->circle.getRadius()) )
+            {
+                enemy->cTransform->velocity.x *= -1;
+            }
+            else if (enemy->cShape->circle.getRadius() > enemy->cShape->circle.getPosition().y || enemy->cShape->circle.getPosition().y  > (m_window.getSize().y - enemy->cShape->circle.getRadius()) )
+            {
+                enemy->cTransform->velocity.y *= -1;
+            }
+            enemy->cTransform->pos.x += enemy->cTransform->velocity.x;
+            enemy->cTransform->pos.y += enemy->cTransform->velocity.y;
+        }
+    }
 }
 
 void Game::sUserInput()
@@ -90,6 +106,13 @@ void Game::sUserInput()
                     case sf::Keyboard::D:
                         m_player->cInput->right = false;
                         break;
+                    case sf::Keyboard::P:
+                        m_paused = true;
+                        break;
+                    case sf::Keyboard::Escape:
+                        m_window.close();
+                        m_running = false;
+                break; 
                     default:
                         break;
                 }
@@ -143,6 +166,38 @@ void Game::sEnemySpawner()
 
 void Game::sCollision()
 {
+    if (m_entities.tagCount("bullet") && m_entities.tagCount("enemy") )
+    {
+        for (auto& bullet : m_entities.getEntities("bullet"))
+        {
+            for (auto& enemy : m_entities.getEntities("enemy"))
+            {
+                Vector2 b_origin(bullet->cShape->circle.getPosition().x, bullet->cShape->circle.getPosition().y);
+                Vector2 e_origin(enemy->cShape->circle.getPosition().x, enemy->cShape->circle.getPosition().y);
+                double dist = b_origin.distance(e_origin);
+                if (dist < (bullet->cCollision->radius + enemy->cCollision->radius))
+                {
+                    enemy->destroy();
+                }
+            }
+        }
+    }
+
+    if (m_entities.tagCount("enemy") )
+    {
+        for (auto& enemy : m_entities.getEntities("enemy"))
+        {
+            Vector2 p_origin(m_player->cShape->circle.getPosition().x, m_player->cShape->circle.getPosition().y);
+            Vector2 e_origin(enemy->cShape->circle.getPosition().x, enemy->cShape->circle.getPosition().y);
+            double dist = p_origin.distance(e_origin);
+            if (dist < (m_player->cCollision->radius + enemy->cCollision->radius))
+            {
+                enemy->destroy();
+                m_player->destroy();
+            }
+        }
+    }
+
 }
 
 void Game::init(const std::string &config)
@@ -237,8 +292,9 @@ void Game::spawnEnemy()
     float ex = rand() % m_window.getSize().x;
     float ey = rand() % m_window.getSize().y;
 
-    float es = (rand() / (float) m_enemyConfig.SMAX) * (m_enemyConfig.SMAX  - m_enemyConfig.SMIN);
-    int v = m_enemyConfig.VMIN + (rand() %(1 + m_enemyConfig.VMAX - m_enemyConfig.VMIN));
+    float es = ((float)rand() / RAND_MAX) * (m_enemyConfig.SMAX  - m_enemyConfig.SMIN) + m_enemyConfig.SMIN;
+    std::cout <<es << "\n";
+    int v = m_enemyConfig.VMIN + (rand() % (1 + m_enemyConfig.VMAX - m_enemyConfig.VMIN));
 
     entity->cTransform = std::make_shared<CTransform>( Vector2(ex, ey),
                                                         Vector2(es, es),
@@ -276,13 +332,38 @@ void Game::run()
     {
         if (m_window.isOpen())
         {
+            if (!m_player->isActive())
+            {
+                m_player.reset();
+            }
             m_entities.update();
             if (!m_paused)
             {
+                if(!m_player.get())
+                {
+                    spawnPlayer();
+                }
                 sEnemySpawner();
                 sMovement();
                 sCollision();
                 sUserInput();
+            }
+            else
+            {
+                sf::Event event;
+                while (m_window.pollEvent(event))
+                {
+                    if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::P)
+                    {
+                        m_paused = false;
+                    }
+                    else if (event.type == sf::Event::Closed || (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape))
+                    {
+                        m_window.close();
+                        m_running = false;
+                        break;
+                    }
+                }
             }
             sRender();
         }

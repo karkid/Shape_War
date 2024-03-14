@@ -87,5 +87,10 @@ void Vector2::normalize()
 
 double Vector2::length() const
 {
-    return sqrtf(x*x + y*y);
+    return std::sqrt(x*x + y*y);
+}
+
+double Vector2::distance(const Vector2 &to) const
+{
+    return std::abs(std::sqrt((x - to.x) * (x - to.x) + (y - to.y) * (y - to.y)));
 }
