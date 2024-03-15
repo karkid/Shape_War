@@ -33,7 +33,6 @@ It is the game build on Entity Component System paradigm.
 
 ## Drawing
 - In the render system, all entities should be given a slow rotation, which makes the game look a little nicer.
-- Any special effects which do not alter game play can be added for up to 5% bonus marks on the assignment. Note that assignments cannot go above 100% total marks, but the 5% bonus can overwrite any marks lost in other areas of the assignment.
 - Any Entity with a lifespan is currently alive, it should have its Color alpha channel set to a ratio depending on how long it has left to live. For example, if an Entity has a 100 frame life span, and it has been alive for 50 frames, its alpha value should be set to 0.5 * 255. The alpha should go from 255 when it is first spawned, to 0 on the last frame it is alive.
 
 ## Configuration File:
