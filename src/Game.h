@@ -59,6 +59,7 @@ class Game
     BulletConfig m_bulletConfig;
     bool m_paused = false;
     bool m_running = true;
+    int m_enemySpwanTime = 0; 
 
     std::shared_ptr<Entity> m_player;
 
@@ -72,6 +73,7 @@ class Game
     void spawnPlayer();
     void spawnEnemy();
     void spawnBullet(EntityPtr source_entity, Vector2 target);
+    void spawnSpecialBullet(EntityPtr source_entity);
 public:
     Game(const std::string& config);
     ~Game() = default;
